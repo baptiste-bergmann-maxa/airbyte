@@ -203,6 +203,14 @@ public class MssqlSource extends AbstractJdbcSource<JDBCType> implements Source 
       configBuilder.put(JdbcUtils.CONNECTION_PROPERTIES_KEY, mssqlConfig.get(JdbcUtils.JDBC_URL_PARAMS_KEY));
     }
 
+    if (mssqlConfig.has("jdbc_start_char")) {
+      this.setStartChar(mssqlConfig.get("jdbc_start_char").asText().charAt(0));
+    }
+
+    if (mssqlConfig.has("jdbc_end_char")) {
+      this.setEndChar(mssqlConfig.get("jdbc_end_char").asText().charAt(0));
+    }
+
     final Map<String, String> additionalParams = new HashMap<>();
     additionalParameters.forEach(param -> {
       final int i = param.indexOf('=');
@@ -231,19 +239,19 @@ public class MssqlSource extends AbstractJdbcSource<JDBCType> implements Source 
   @Override
   public AirbyteCatalog discover(final JsonNode config) {
     final AirbyteCatalog catalog = super.discover(config);
-
+    
     if (MssqlCdcHelper.isCdc(config)) {
       final List<AirbyteStream> streams = catalog.getStreams().stream()
-          .map(MssqlSource::overrideSyncModes)
-          .map(MssqlSource::removeIncrementalWithoutPk)
-          .map(MssqlSource::setIncrementalToSourceDefined)
-          .map(MssqlSource::setDefaultCursorFieldForCdc)
-          .map(MssqlSource::addCdcMetadataColumns)
-          .collect(toList());
-
+      .map(MssqlSource::overrideSyncModes)
+      .map(MssqlSource::removeIncrementalWithoutPk)
+      .map(MssqlSource::setIncrementalToSourceDefined)
+      .map(MssqlSource::setDefaultCursorFieldForCdc)
+      .map(MssqlSource::addCdcMetadataColumns)
+      .collect(toList());
+      
       catalog.setStreams(streams);
     }
-
+    
     return catalog;
   }
 

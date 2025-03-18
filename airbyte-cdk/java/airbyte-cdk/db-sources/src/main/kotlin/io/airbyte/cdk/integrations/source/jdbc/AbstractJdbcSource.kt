@@ -101,6 +101,29 @@ abstract class AbstractJdbcSource<Datatype>(
     @JvmField val sourceOperations: JdbcCompatibleSourceOperations<Datatype>
 
     override var quoteString: String? = null
+    protected var start_char: Char = '0'
+    fun setStartChar(value: Char) {
+            if (value in '0'..'Z') {
+                start_char = value
+                LOGGER.info { "Set start char as : $value" }
+
+            } else {
+                throw IllegalArgumentException("start_char must be a letter between 0 and Z")
+            }
+        }
+    fun getStartChar() = start_char
+
+    protected var end_char: Char = '1'
+    fun setEndChar(value: Char) {
+            if (value in '0'..'Z') {
+                end_char = value
+                LOGGER.info { "Set end char as : $value" }
+            } else {
+                throw IllegalArgumentException("end_char must be a letter between 0 and Z")
+            }
+        }
+    fun getEndChar() = end_char
+
     @JvmField val dataSources: MutableCollection<DataSource> = ArrayList()
 
     init {
@@ -382,6 +405,9 @@ abstract class AbstractJdbcSource<Datatype>(
             ) // group by schema and table name to handle the case where a table with the same name
             // exists in
             // multiple schemas.
+            .filter { t: JsonNode ->
+                t.get(INTERNAL_TABLE_NAME).asText().uppercase()[0] in start_char..end_char
+            }
             .groupBy { t: JsonNode ->
                 ImmutablePair.of<String, String>(
                     t.get(INTERNAL_SCHEMA_NAME).asText(),
