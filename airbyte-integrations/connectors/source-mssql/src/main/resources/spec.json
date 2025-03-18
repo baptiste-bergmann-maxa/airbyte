@@ -59,6 +59,18 @@
         "type": "string",
         "order": 6
       },
+      "jdbc_start_char": {
+        "title": "JDBC Table Start Char",
+        "description": "table_name[0] >= star_char",
+        "type": "string",
+        "order": 7
+      },
+      "jdbc_end_char": {
+        "title": "JDBC Table End Char",
+        "description": "table_name[0] <= end_char",
+        "type": "string",
+        "order": 8
+      },
       "ssl_method": {
         "title": "SSL Method",
         "type": "object",
